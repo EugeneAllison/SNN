@@ -1,0 +1,6 @@
+# *.pyc
+# data
+# result
+# .vscode
+# # .pytest_cache
+# # *.ipynb
