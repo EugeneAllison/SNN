@@ -20,12 +20,19 @@ from functools import reduce
 from collections import defaultdict
 
 
+# 全局参数
 SQUASH = [0.9595, 0.0661]
 ALPHA = SQUASH[0] * SQUASH[1]
 V_AVG = 8
 V_SD = 10
 A_AVG = ALPHA * V_AVG
 A_SD = ALPHA * V_SD
+
+
+"""
+阈值电位（h_th）：超过该值时，神经元触发尖峰。
+窗口期（refs）：在尖峰触发后，神经元需要一个恢复期，期间不会再次触发尖峰。
+"""
 
 
 class SpikingLayer(object):
@@ -39,22 +46,36 @@ class SpikingLayer(object):
         # v2 = v_sigma + v1**2
         W_avg = (v_avg - b_avg) / (alpha * N * v_avg)
         # W1 = (v1 - b1) / (alpha * N * v1)
-        W_sm = (v_sm + alpha**2 * (N - N**2) * W_avg**2 * v_avg**2 - 2 * alpha * N * b_avg * v_avg * W_avg - b_avg**2) / (alpha**2 * N * v_sm)
+        W_sm = (
+            v_sm
+            + alpha**2 * (N - N**2) * W_avg**2 * v_avg**2
+            - 2 * alpha * N * b_avg * v_avg * W_avg
+            - b_avg**2
+        ) / (alpha**2 * N * v_sm)
         # W2 = (v2 + alpha**2 * (N - N**2) * W1**2 * v1**2 - 2 * alpha * N * b1 * v1 * W1 - b1**2) / (alpha**2 * N * v2)
         W_sd = math.sqrt(W_sm - W_avg**2)
         # W_sigma = W2 - W1 ** 2
         return b_avg, W_avg, W_sd
+    # 根据输入的统计特性计算权重的均值（W_avg）和标准差（W_sd）。
 
     def init_weight(self, **kwargs):
         b_avg, W_avg, W_sd = self.__random_weight(self.dim_in)
-        self.W = np.random.uniform(
-            low=-math.sqrt(3), high=math.sqrt(3),
-            size=(self.dim_in, self.dim_out)) * W_sd + W_avg
+        self.W = (
+            np.random.uniform(
+                low=-math.sqrt(3), high=math.sqrt(3), size=(self.dim_in, self.dim_out)
+            )
+            * W_sd
+            + W_avg
+        )
         self.b = np.ones(self.dim_out) * b_avg
 
-        self._B = np.random.uniform(
-            low=-math.sqrt(3), high=math.sqrt(3),
-            size=(self.dim_out, self.dim_in)) * W_sd + W_avg
+        self._B = (
+            np.random.uniform(
+                low=-math.sqrt(3), high=math.sqrt(3), size=(self.dim_out, self.dim_in)
+            )
+            * W_sd
+            + W_avg
+        )
         self.eta = 2 / self.dim_in
 
     def init_state(self, inputs, keep_state=True):
@@ -116,7 +137,7 @@ class SpikingLayer(object):
 
     @property
     def histogram(self):
-        return np.asarray(self.hist[:self.update_cnt])
+        return np.asarray(self.hist[: self.update_cnt])
 
 
 class SpikingNetwork(object):
@@ -130,8 +151,7 @@ class SpikingNetwork(object):
 
         B = np.eye(class_num)
         self.layers[-1].B = np.array(B)
-        for l_pre, l_post in zip(
-                reversed(self.layers[:-1]), reversed(self.layers[1:])):
+        for l_pre, l_post in zip(reversed(self.layers[:-1]), reversed(self.layers[1:])):
             print(B.shape, l_post._B.shape)
             B = np.dot(B, l_post._B) * bf
             l_pre.B = B
@@ -142,7 +162,9 @@ class SpikingNetwork(object):
         for l in self.layers:
             l.init_state(inputs, **kwargs)
 
-    def step(self, dt, inputs, outputs, bfunc=None, lr=1.0, final_only=False, use_bp=False):
+    def step(
+        self, dt, inputs, outputs, bfunc=None, lr=1.0, final_only=False, use_bp=False
+    ):
         a = inputs
         for l in self.layers:
             a = l.forward(dt, a)
