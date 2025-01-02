@@ -23,7 +23,7 @@ from torchvision import datasets, transforms
 
 sys.path.append(".")
 
-from pyutils.figure import Figure
+# from pyutils.figure import Figure # 图片
 from pyutils.tqdm import tqdm, trange
 
 import src.library.style
@@ -32,14 +32,14 @@ from src.library.numpy.spiking_network import SpikingNetwork
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--root_dir', type=str, required=True)
+parser.add_argument('--root_dir', type=str, required=True) # 必须
 parser.add_argument('--init_id', type=int, default=0)
 parser.add_argument('--trial_num', type=int, default=1)
 parser.add_argument('--net_dims', type=int, nargs="+", default=[784, 1000, 10])
 parser.add_argument('--n_epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--lr', type=float, default=1)
-parser.add_argument('--bfunc', type=str, required=True)
+parser.add_argument('--bfunc', type=str, required=True) # 必须
 parser.add_argument('--amp', type=float, default=1.0)
 parser.add_argument('--phase', type=float, default=0)
 
@@ -134,34 +134,35 @@ if __name__ == "__main__":
     minibatch_cnt = X_train.shape[0] // args.batch_size
     model.record(size=args.n_epochs * minibatch_cnt * 2)
 
-    fig_hist = Figure(figsize=(8 * len(model.layers), 8))
-    fig_hist.create_grid((1, len(model.layers)))
+    # fig_hist = Figure(figsize=(8 * len(model.layers), 8)) # 图片 137（now）——147
+    # fig_hist.create_grid((1, len(model.layers)))
 
-    def display(model):
-        model.record()
-        for i, l in enumerate(model.layers):
-            fig_hist[i].cla()
-            fig_hist[i].plot_matrix(
-                l.histogram, num_label_x=10, ticks_fmt="{:.0f}",
-                x=l.center, colorbar=False, aspect="auto")
-        fig_hist.savefig(f"{args.root_dir}/historgram.png")
+    # def display(model):
+    #     model.record()
+    #     for i, l in enumerate(model.layers):
+    #         fig_hist[i].cla()
+    #         fig_hist[i].plot_matrix(
+    #             l.histogram, num_label_x=10, ticks_fmt="{:.0f}",
+    #             x=l.center, colorbar=False, aspect="auto")
+    #     fig_hist.savefig(f"{args.root_dir}/historgram.png")
 
     records = defaultdict(list)
     for epoch in trange(args.n_epochs, leave=True):
-        model, acc_t = run(
-            model, X_train, Y_train, args.dt, args.T,
-            args.T_th, callback=display)
-        records["acc_t"].append(acc_t)
-        model, acc_e = run(
-            model, X_eval, Y_eval, args.dt, args.T)
-        records["acc_e"].append(acc_e)
-        fig = Figure()
-        fig[0].plot(records["acc_t"])
-        fig[0].plot(records["acc_e"])
-        fig[0].set_title("best: {:.4f}/{:.4f}".format(
-            np.max(records["acc_t"]), np.max(records["acc_e"])))
-        fig.savefig(f"{args.root_dir}/records.png")
-        fig.close()
+        # 图片：以下到fig.close
+        # model, acc_t = run(
+        #     model, X_train, Y_train, args.dt, args.T,
+        #     args.T_th, callback=display)
+        # records["acc_t"].append(acc_t)
+        # model, acc_e = run(
+        #     model, X_eval, Y_eval, args.dt, args.T)
+        # records["acc_e"].append(acc_e)
+        # fig = Figure()
+        # fig[0].plot(records["acc_t"])
+        # fig[0].plot(records["acc_e"])
+        # fig[0].set_title("best: {:.4f}/{:.4f}".format(
+        #     np.max(records["acc_t"]), np.max(records["acc_e"])))
+        # fig.savefig(f"{args.root_dir}/records.png")
+        # fig.close()
 
         histogram = {str(i): l.histogram for i, l in enumerate(model.layers)}
         np.savez(f"{args.root_dir}/histogram.npz", **histogram)
