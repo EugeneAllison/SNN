@@ -32,6 +32,11 @@ A_SD = ALPHA * V_SD
 """
 阈值电位（h_th）：超过该值时，神经元触发尖峰。
 窗口期（refs）：在尖峰触发后，神经元需要一个恢复期，期间不会再次触发尖峰。
+
+v_sd (Standard Deviation of Voltage) 神经元膜电位标准差
+iota (Adjustment for Weight Update) 调整因子，用于权重更新
+v_sm (smoothed???)
+
 """
 
 

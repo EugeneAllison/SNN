@@ -22,16 +22,19 @@ import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
 import matplotlib.ticker as mticker
 import matplotlib.gridspec as gridspec
-from matplotlib.axes._subplots import Subplot
+# from matplotlib.axes._subplots import Subplot
+from matplotlib.axes import Axes  # 使用公开的 Axes 类
+
 from matplotlib.colors import LogNorm, BoundaryNorm
 from matplotlib.ticker import LogFormatterMathtext
 from matplotlib.backends.backend_pdf import PdfPages
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 
-
-warnings.filterwarnings("ignore", category=cbook.mplDeprecation)
-
+# 全部改正方法见TranThanhMan -- 一月 -- Figure 代码修改
+# warnings.filterwarnings("ignore", category=cbook.mplDeprecation)
+# 将 mplDeprecation 替换为标准的 DeprecationWarning
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # override Subplot class
 def __getitem__(self, key, hide_parent=True):
@@ -265,8 +268,11 @@ func_list = [__getitem__, create_grid, share_x, convert_3d,
              plot_matrix, plot_dataframe, bar_stack, bar_plot, add_zoom_func,
              scientific_ticker, set_log_grid]
 
+# for _func in func_list:
+#     setattr(Subplot, _func.__name__, _func)
+# 动态绑定函数到 Axes 类
 for _func in func_list:
-    setattr(Subplot, _func.__name__, _func)
+    setattr(Axes, _func.__name__, _func)
 
 # configuring Figure class
 
@@ -287,9 +293,17 @@ class Figure(object):
         self._ax_dict = {}
         self._spec_list = []
 
-    def __getitem__(self, key) -> Subplot:
+    # def __getitem__(self, key) -> Subplot:
+    #     spec_key = self._grid_spec[key]
+    #     if not(spec_key in self._spec_list):
+    #         self._ax_dict[spec_key] = self._fig.add_subplot(spec_key)
+    #         self._spec_list.append(spec_key)
+    #     return self._ax_dict[spec_key]
+
+    # 修改：
+    def __getitem__(self, key) -> Axes:  # 使用 Axes 而非 Subplot
         spec_key = self._grid_spec[key]
-        if not(spec_key in self._spec_list):
+        if not (spec_key in self._spec_list):
             self._ax_dict[spec_key] = self._fig.add_subplot(spec_key)
             self._spec_list.append(spec_key)
         return self._ax_dict[spec_key]
