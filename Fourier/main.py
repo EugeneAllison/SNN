@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+sys.path.append(".")
 import src.library.numpy.func_loader
 import os
 import sys
@@ -14,8 +16,8 @@ import itertools
 import functools
 import scipy.stats
 import pandas as pd
-from src.library.numpy.func_loader import gaussian_optimize
-from src.library.numpy.func_loader import gaussian_normalize
+# from src.library.numpy.func_loader import gaussian_optimize
+# from src.library.numpy.func_loader import gaussian_normalize
 
 from src.library.numpy.func_loader import opto
 from src.library.numpy.func_loader import acc_clip
@@ -29,7 +31,7 @@ from torchvision import datasets, transforms
 # parser.add_argument('--bfunc', type=str, required=True)
 # parser.add_argument('--k', type=str, default=4)
 # #parser.add_argument('--seed', type=str, default=0)
-#
+
 # args = parser.parse_args()
 # func = getattr(src.library.numpy.func_loader, args.bfunc)
 # bfunc = lambda v: func(v, args.k, args.seed)
@@ -60,9 +62,6 @@ class Fourier(object):
         ys = self._func(ts)
         self._m = np.min(ys)
         return self._m
-
-
-
 
 
 def Correlation(k,s, amp, phase):
