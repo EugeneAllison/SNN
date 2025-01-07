@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+
 sys.path.append(".")
 import src.library.numpy.func_loader
 import os
@@ -16,6 +17,7 @@ import itertools
 import functools
 import scipy.stats
 import pandas as pd
+
 # from src.library.numpy.func_loader import gaussian_optimize
 # from src.library.numpy.func_loader import gaussian_normalize
 
@@ -27,10 +29,12 @@ from functools import reduce
 from collections import defaultdict
 from sklearn.datasets import fetch_openml
 from torchvision import datasets, transforms
+
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--bfunc', type=str, required=True)
 # parser.add_argument('--k', type=str, default=4)
 # #parser.add_argument('--seed', type=str, default=0)
+
 
 # args = parser.parse_args()
 # func = getattr(src.library.numpy.func_loader, args.bfunc)
@@ -49,8 +53,8 @@ class Fourier(object):
     def _func(self, t):
         fs = np.pi * np.arange(1, self.dim + 1)
         ot = np.outer(t, fs)
-        st = np.sin(ot).dot(self.coefs[:self.dim])
-        ct = np.cos(ot).dot(self.coefs[self.dim:])
+        st = np.sin(ot).dot(self.coefs[: self.dim])
+        ct = np.cos(ot).dot(self.coefs[self.dim :])
         out = st + ct
         return out.reshape(*t.shape)
 
@@ -64,24 +68,31 @@ class Fourier(object):
         return self._m
 
 
-def Correlation(k,s, amp, phase):
-    x = np.linspace(-100,100,20001)
-    #x = np.arange(-1, 1, 0.01)
-    g_func = acc_clip(x, clip_max=1.0)
-    f_func = Fourier(k,s)
-    f_func=f_func(amp*x+phase)
-    up = np.sum((g_func - np.mean(g_func))*(f_func - np.mean(f_func)))
-    down = np.sqrt(np.sum(np.abs(g_func - np.mean(g_func))**2)) * np.sqrt(np.sum(np.abs(f_func - np.mean(f_func))**2))
-    nita = up/down
-    return  nita
-
-def Correlation_test3(k,s, amp, phase):
-    x = np.linspace(-100,100,20001)
+# 标准nita, g: acc_clip 处理, f: Fourier
+def Correlation(k, s, amp, phase):
+    x = np.linspace(-100, 100, 20001)
     # x = np.arange(-1, 1, 0.01)
-    g = acc_clip(x,clip_max=1.0)
-    f = Fourier(amp*x+phase,k,s)
-    return  np.dot(f,g) / np.linalg.norm(f) / np.linalg.norm(g)
+    g_func = acc_clip(x, clip_max=1.0)
+    f_func = Fourier(k, s)
+    f_func = f_func(amp * x + phase)
+    up = np.sum((g_func - np.mean(g_func)) * (f_func - np.mean(f_func)))
+    down = np.sqrt(np.sum(np.abs(g_func - np.mean(g_func)) ** 2)) * np.sqrt(
+        np.sum(np.abs(f_func - np.mean(f_func)) ** 2)
+    )
+    nita = up / down
+    return nita
 
+
+# 除以范数
+def Correlation_test3(k, s, amp, phase):
+    x = np.linspace(-100, 100, 20001)
+    # x = np.arange(-1, 1, 0.01)
+    g = acc_clip(x, clip_max=1.0)
+    f = Fourier(amp * x + phase, k, s)
+    return np.dot(f, g) / np.linalg.norm(f) / np.linalg.norm(g)
+
+
+## f: opto, 且输入经过线性变换
 # def Correlation2(amp, phase):
 #     x = np.linspace(-100,100,20001)
 #     # x = np.arange(-1, 1, 0.01)
@@ -99,6 +110,7 @@ def Correlation_test3(k,s, amp, phase):
 #     f = opto(amp*x + phase)
 #     return  np.dot(f,g) / np.linalg.norm(f) / np.linalg.norm(g)
 #
+## f: gaussian_optimize
 # def Correlation_test2(a,b,c):
 #     x = np.linspace(-100,100,20001)
 #     # x = np.arange(-1, 1, 0.01)
@@ -106,6 +118,7 @@ def Correlation_test3(k,s, amp, phase):
 #     f = gaussian_optimize(x,a,b,c)
 #     return  np.dot(f,g) / np.linalg.norm(f) / np.linalg.norm(g)
 #
+## gaussian_optimize
 # def Correlation3(a,b,c):
 #     x = np.linspace(-100,100,20001)
 #     #x = np.arange(-1, 1, 0.01)sine
@@ -119,7 +132,7 @@ def Correlation_test3(k,s, amp, phase):
 #     return  nita
 
 if __name__ == "__main__":
-    k=4
+    k = 4
     cor_lst001 = []
     cor_lst01 = []
     cor_lst1 = []
@@ -131,7 +144,7 @@ if __name__ == "__main__":
     lst_02 = []
     lst_01 = []
     lst_00 = []
-    #cor, func = Correlation(k, 0)
+    # cor, func = Correlation(k, 0)
     for seed in range(0, 10000):
         cor_001 = Correlation(k, seed, amp=0.01, phase=0)
         # if cor>=0.5:
@@ -147,7 +160,7 @@ if __name__ == "__main__":
         # else:
         #     lst_00.append((seed, cor))
         cor_lst001.append(cor_001)
-        #cor_sl.append((seed,cor))
+        # cor_sl.append((seed,cor))
 
     for i in range(0, 10000):
         cor_0001 = Correlation(k, i, amp=0.001, phase=0)
@@ -166,7 +179,7 @@ if __name__ == "__main__":
     #     reverse=True
     # )
     # print(sorted_list)
-    tick = [-1.0,-0.5,0,0.5,1.0]
+    tick = [-1.0, -0.5, 0, 0.5, 1.0]
     # fig1=plt.figure(1, figsize=(4,3))
     # plt.hist(cor_lst1, bins=50, range=(-1,1), density=True, color='#ADD8E6')
     # plt.tick_params(labelsize=20)
@@ -191,23 +204,23 @@ if __name__ == "__main__":
     # ax3.set_xlabel('Correlation Coefficient')
     # ax3.set_ylabel('Density')
 
-    fig4=plt.figure(1, figsize=(4,3))
-    plt.hist(cor_lst0001, bins=50, range=(-1,1), density=True, color='#ADD8E6')
+    fig4 = plt.figure(1, figsize=(4, 3))
+    plt.hist(cor_lst0001, bins=50, range=(-1, 1), density=True, color="#ADD8E6")
     plt.tick_params(labelsize=20)
     plt.xticks(tick)
-    fig4.savefig('distribution_0001.png', dpi=500)
+    fig4.savefig("distribution_0001.png", dpi=500)
     # ax4.set_title('amp = 0.001')
     # ax4.set_xlabel('Correlation Coefficient')
 
     # fig.suptitle('Distribution of Correlation Coefficient', fontsize=18)
 
     plt.show()
-    #print(lst_05)
-    #print(lst_04)
-    #print(lst_03)
-    #print(lst_02)
-    #print(lst_01)
-    #print(lst_00)
+    # print(lst_05)
+    # print(lst_04)
+    # print(lst_03)
+    # print(lst_02)
+    # print(lst_01)
+    # print(lst_00)
 
     #
     # # opto_lst =[]
@@ -271,8 +284,7 @@ if __name__ == "__main__":
     #           fontweight='bold')
     # plt.show()
 
-
-    #plot gaussian and opto
+    # plot gaussian and opto
     # x = lst
     # plt.figure('f1', figsize=(6,3))
     # plt.plot(x, cor_lst4, '.-',color= '#FFA500')

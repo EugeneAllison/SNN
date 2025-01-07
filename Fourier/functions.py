@@ -15,9 +15,9 @@ import functools
 import scipy.stats
 import pandas as pd
 from src.library.numpy.func_loader import tanh
-from src.library.numpy.func_loader import gaussian_optimize
-from src.library.numpy.func_loader import gaussian_normalize
-#from src.library.numpy.func_loader import Fourier
+# from src.library.numpy.func_loader import gaussian_optimize
+# from src.library.numpy.func_loader import gaussian_normalize
+from src.library.numpy.func_loader import Fourier
 from src.library.numpy.func_loader import opto
 from src.library.numpy.func_loader import approx
 from src.library.numpy.func_loader import accurate
@@ -124,7 +124,11 @@ def record_parameter(path,path2):
 
 if __name__ == "__main__":
     x = np.linspace(-100, 100, 20001)
-    record_parameter('/home/isi/zhang/SNN/src/script/Fourier/PRFS_Result/correlation_coefficient','/home/isi/zhang/SNN/src/script/Fourier_BP/trial_2' )
+    # record_parameter('/home/isi/zhang/SNN/src/script/Fourier/PRFS_Result/correlation_coefficient','/home/isi/zhang/SNN/src/script/Fourier_BP/trial_2' )
+    record_parameter(
+        "/home/isi/li/spiking_dfa_newtork/Fourier/My_Result/correlation_coefficient",
+        "/home/isi/li/spiking_dfa_newtork/Fourier/src/script/Fourier_BP/trial_2",
+    )
 
     # opto_MNIST = opto(0.15*x + 155*math.pi /180)
     # opto_FMNIST = opto(0.1*x + 160*math.pi/180)

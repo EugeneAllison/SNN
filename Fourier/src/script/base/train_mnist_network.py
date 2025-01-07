@@ -21,11 +21,9 @@ from collections import defaultdict
 from sklearn.datasets import fetch_openml
 from torchvision import datasets, transforms
 
-sys.path.append(".")
-# sys.path.append("/Users/zhangyongbo/Desktop/Systematically analyze aDFA/project_SNN/spiking_dfa_newtork (1)/")
+sys.path.append(".") 
 
-
-from pyutils.figure import Figure
+from pyutils.figure import Figure # 图片
 from pyutils.tqdm import tqdm, trange
 
 import src.library.style
@@ -34,18 +32,16 @@ from src.library.numpy.spiking_network import SpikingNetwork
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--root_dir', type=str, required=True)
+parser.add_argument('--root_dir', type=str, required=True) # 必须
 parser.add_argument('--init_id', type=int, default=0)
 parser.add_argument('--trial_num', type=int, default=1)
 parser.add_argument('--net_dims', type=int, nargs="+", default=[784, 1000, 10])
 parser.add_argument('--n_epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--lr', type=float, default=1)
-parser.add_argument('--bfunc', type=str, required=True)
-parser.add_argument('--k', type=float, default=4) #check approx
-parser.add_argument('--seed', type=float, default=1196)
-parser.add_argument('--amp', type=float, default=0.01) #check approx
-
+parser.add_argument('--bfunc', type=str, required=True) # 必须
+parser.add_argument('--amp', type=float, default=1.0)
+parser.add_argument('--phase', type=float, default=0)
 
 parser.add_argument('--radian', action="store_true")
 parser.add_argument('--final_only', action="store_true")
@@ -55,9 +51,6 @@ parser.add_argument('--T', type=float, default=100)
 parser.add_argument('--T_th', type=float, default=20)
 parser.add_argument('--dt', type=float, default=0.25)
 
-#introduce the interface of spectral radius
-parser.add_argument('--rho', type=float, default=0)
-
 args = parser.parse_args()
 
 data_train = datasets.MNIST(
@@ -65,34 +58,10 @@ data_train = datasets.MNIST(
 data_eval = datasets.MNIST(
     "../data/mnist", train=False, download=True)
 
-
 X_train, Y_train = data_train.data.numpy() / 255, data_train.targets.numpy()
 X_eval, Y_eval = data_eval.data.numpy() / 255, data_eval.targets.numpy()
 X_train = X_train.reshape(X_train.shape[0], -1)
 X_eval = X_eval.reshape(X_eval.shape[0], -1)
-
-#simplify the dataset;
-
-# idx_train = np.logical_or(Y_train == 0, Y_train == 1)
-# idx_eval = np.logical_or(Y_eval == 0, Y_eval == 1)
-# X_train, Y_train = X_train[idx_train], Y_train[idx_train]
-# X_eval, Y_eval = X_eval[idx_eval], Y_eval[idx_eval]
-#
-# print(X_train.shape, X_eval.shape)
-#
-# def remove(x,y,batch_size):
-#     if len(x) / batch_size != 0:
-#         index = len(x)%batch_size
-#         for i in range(-1, -index-1,-1):
-#             x = np.delete(x, i, axis=0)
-#             y = np.delete(y, i, axis=0)
-#     print('x.shape is desized!', x.shape, y.shape)
-#     return x,y
-#
-#
-# X_train, Y_train = remove(X_train, Y_train, args.batch_size)
-#
-# X_eval, Y_eval = remove(X_eval, Y_eval, args.batch_size)
 
 
 def is_float(element):
@@ -104,8 +73,12 @@ def is_float(element):
 
 
 func = getattr(src.library.numpy.func_loader, args.bfunc)
+if args.radian:
+    phase = args.phase
+else:
+    phase = args.phase * math.pi / 180
 
-bfunc = lambda v: func(args.amp*v, args.k, args.seed)
+bfunc = lambda v: func(args.amp * v + phase)
 
 # if args.phase is None:
 #     bfunc = lambda v: (v > 0) * (1 / np.cosh(0.08 * v))**2
@@ -156,12 +129,12 @@ if __name__ == "__main__":
     with open(f"{args.root_dir}/args.json", mode="w") as f:
         json.dump(args.__dict__, f, indent=4)
 
-    model = SpikingNetwork(args.net_dims, args.rho)
+    model = SpikingNetwork(args.net_dims)
 
     minibatch_cnt = X_train.shape[0] // args.batch_size
     model.record(size=args.n_epochs * minibatch_cnt * 2)
 
-    fig_hist = Figure(figsize=(8 * len(model.layers), 8))
+    fig_hist = Figure(figsize=(8 * len(model.layers), 8)) # 图片 137（now）——147
     fig_hist.create_grid((1, len(model.layers)))
 
     def display(model):
@@ -175,6 +148,7 @@ if __name__ == "__main__":
 
     records = defaultdict(list)
     for epoch in trange(args.n_epochs, leave=True):
+        # 图片：以下到fig.close
         model, acc_t = run(
             model, X_train, Y_train, args.dt, args.T,
             args.T_th, callback=display)
