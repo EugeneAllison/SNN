@@ -155,6 +155,7 @@ class NoiseFunc(object):
 class Fourier(object):
     def __init__(self, dim, seed=None, resolution=10001):
         self.dim = dim
+        print(dim)
         self.rnd = np.random.RandomState(seed)
         self.coefs = self.rnd.uniform(-1, 1, dim * 2)
         self.coefs /= np.abs(self.coefs).sum()

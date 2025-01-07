@@ -14,8 +14,8 @@ import itertools
 import functools
 import scipy.stats
 import pandas as pd
-from src.library.numpy.func_loader import gaussian_optimize
-from src.library.numpy.func_loader import gaussian_normalize
+# from src.library.numpy.func_loader import gaussian_optimize
+# from src.library.numpy.func_loader import gaussian_normalize
 from src.library.numpy.func_loader import Fourier
 from src.library.numpy.func_loader import opto
 from src.library.numpy.func_loader import acc_clip
@@ -85,17 +85,17 @@ def Correlation2_ori(amp, phase):
 #     f = gaussian_optimize(x,a,b,c)
 #     return  np.dot(f,g) / np.linalg.norm(f) / np.linalg.norm(g)
 #
-def Correlation3(a,b,c,low, high):
-    x = np.linspace(low,high,20001)
-    #x = np.arange(-1, 1, 0.01)sine
-    #func = getattr(src.library.numpy.func_loader, func)
-    #func = lambda v: func(v, args.k, args.seed)
-    g_func = acc_clip(x, clip_max=1.0)
-    f_func = gaussian_optimize(x,a,b,c)
-    up = np.sum((g_func - np.mean(g_func))*(f_func - np.mean(f_func)))
-    down = np.sqrt(np.sum(np.abs(g_func - np.mean(g_func))**2)) * np.sqrt(np.sum(np.abs(f_func - np.mean(f_func))**2))
-    nita = up/down
-    return  nita
+# def Correlation3(a,b,c,low, high):
+#     x = np.linspace(low,high,20001)
+#     #x = np.arange(-1, 1, 0.01)sine
+#     #func = getattr(src.library.numpy.func_loader, func)
+#     #func = lambda v: func(v, args.k, args.seed)
+#     g_func = acc_clip(x, clip_max=1.0)
+#     f_func = gaussian_optimize(x,a,b,c)
+#     up = np.sum((g_func - np.mean(g_func))*(f_func - np.mean(f_func)))
+#     down = np.sqrt(np.sum(np.abs(g_func - np.mean(g_func))**2)) * np.sqrt(np.sum(np.abs(f_func - np.mean(f_func))**2))
+#     nita = up/down
+#     return  nita
 
 
 def Correlationf():

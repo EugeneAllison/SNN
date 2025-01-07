@@ -68,7 +68,7 @@ class Fourier(object):
         return self._m
 
 
-# 标准nita, g: acc_clip 处理, f: Fourier
+
 def Correlation(k, s, amp, phase):
     x = np.linspace(-100, 100, 20001)
     # x = np.arange(-1, 1, 0.01)
@@ -83,7 +83,7 @@ def Correlation(k, s, amp, phase):
     return nita
 
 
-# 除以范数
+
 def Correlation_test3(k, s, amp, phase):
     x = np.linspace(-100, 100, 20001)
     # x = np.arange(-1, 1, 0.01)
@@ -92,7 +92,7 @@ def Correlation_test3(k, s, amp, phase):
     return np.dot(f, g) / np.linalg.norm(f) / np.linalg.norm(g)
 
 
-## f: opto, 且输入经过线性变换
+
 # def Correlation2(amp, phase):
 #     x = np.linspace(-100,100,20001)
 #     # x = np.arange(-1, 1, 0.01)
@@ -129,11 +129,11 @@ def Correlation_test3(k, s, amp, phase):
 #     up = np.sum((g_func - np.mean(g_func))*(f_func - np.mean(f_func)))
 #     down = np.sqrt(np.sum(np.abs(g_func - np.mean(g_func))**2)) * np.sqrt(np.sum(np.abs(f_func - np.mean(f_func))**2))
 #     nita = up/down
-#     return  nita
+#     return nita
 
 if __name__ == "__main__":
     k = 4
-    cor_lst001 = []
+    cor_lst001 = []  
     cor_lst01 = []
     cor_lst1 = []
     cor_lst0001 = []
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     lst_01 = []
     lst_00 = []
     # cor, func = Correlation(k, 0)
-    for seed in range(0, 10000):
+    for seed in range(0, 10000):  
         cor_001 = Correlation(k, seed, amp=0.01, phase=0)
         # if cor>=0.5:
         #     lst_05.append((seed, cor))
@@ -185,9 +185,9 @@ if __name__ == "__main__":
     # plt.tick_params(labelsize=20)
     # plt.xticks(tick)
     # fig1.savefig('distribution_1.png', dpi=500)
-    # # ax1.set_title('amp = 1')
-    # # ax1.set_ylabel('Density')
-    #
+    ## ax1.set_title('amp = 1')
+    ## ax1.set_ylabel('Density')
+    
     # fig2 = plt.figure(1, figsize=(4, 3))
     # plt.hist(cor_lst01, bins=50, range=(-1,1), density=True, color='#ADD8E6')
     # plt.tick_params(labelsize=20)

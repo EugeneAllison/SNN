@@ -6,7 +6,7 @@ import matplotlib as mpl
 import json
 import os
 import sys
-from src.script.Fourier.calculate_cc import Correlation
+from calculate_cc import Correlation
 import seaborn as sns
 from csv import reader
 from pandas import read_csv

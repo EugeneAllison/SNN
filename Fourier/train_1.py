@@ -29,7 +29,7 @@ from pyutils.figure import Figure
 from pyutils.tqdm import tqdm, trange
 
 import src.library.style
-import src.library.numpy.func_loader
+from src.library.numpy.func_loader import Fourier
 from src.library.numpy.spiking_network import SpikingNetwork
 
 
@@ -41,7 +41,7 @@ parser.add_argument('--net_dims', type=int, nargs="+", default=[784, 1000, 10])
 parser.add_argument('--n_epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--lr', type=float, default=1)
-parser.add_argument('--bfunc', type=str, required=True)
+#parser.add_argument('--bfunc', type=str, required=True)
 parser.add_argument('--k', type=float, default=4) #check approx
 parser.add_argument('--seed', type=float, default=1196)
 parser.add_argument('--amp', type=float, default=0.01) #check approx
@@ -55,7 +55,7 @@ parser.add_argument('--T', type=float, default=100)
 parser.add_argument('--T_th', type=float, default=20)
 parser.add_argument('--dt', type=float, default=0.25)
 
-#introduce the interface of spectral radius
+# introduce the interface of spectral radius
 parser.add_argument('--rho', type=float, default=0)
 
 args = parser.parse_args()
@@ -71,7 +71,7 @@ X_eval, Y_eval = data_eval.data.numpy() / 255, data_eval.targets.numpy()
 X_train = X_train.reshape(X_train.shape[0], -1)
 X_eval = X_eval.reshape(X_eval.shape[0], -1)
 
-#simplify the dataset;
+# simplify the dataset;
 
 # idx_train = np.logical_or(Y_train == 0, Y_train == 1)
 # idx_eval = np.logical_or(Y_eval == 0, Y_eval == 1)
@@ -103,9 +103,9 @@ def is_float(element):
         return False
 
 
-func = getattr(src.library.numpy.func_loader, args.bfunc)
-
-bfunc = lambda v: func(args.amp*v, args.k, args.seed)
+#func = getattr(src.library.numpy.func_loader, args.bfunc)
+func = Fourier(args.k, args.seed)
+bfunc = lambda v: func(args.amp*v)
 
 # if args.phase is None:
 #     bfunc = lambda v: (v > 0) * (1 / np.cosh(0.08 * v))**2
