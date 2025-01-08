@@ -41,9 +41,9 @@ parser.add_argument('--net_dims', type=int, nargs="+", default=[784, 1000, 10])
 parser.add_argument('--n_epochs', type=int, default=20)
 parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--lr', type=float, default=1)
-#parser.add_argument('--bfunc', type=str, required=True)
+# parser.add_argument('--bfunc', type=str, required=True)
 parser.add_argument('--k', type=float, default=4) #check approx
-parser.add_argument('--seed', type=float, default=1196)
+parser.add_argument("--seed", type=float, default=325)
 parser.add_argument('--amp', type=float, default=0.01) #check approx
 
 
@@ -103,9 +103,11 @@ def is_float(element):
         return False
 
 
-#func = getattr(src.library.numpy.func_loader, args.bfunc)
+# func = getattr(src.library.numpy.func_loader, args.bfunc)
 func = Fourier(args.k, args.seed)
 bfunc = lambda v: func(args.amp*v)
+
+
 
 # if args.phase is None:
 #     bfunc = lambda v: (v > 0) * (1 / np.cosh(0.08 * v))**2

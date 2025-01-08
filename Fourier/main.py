@@ -17,6 +17,7 @@ import itertools
 import functools
 import scipy.stats
 import pandas as pd
+import random
 
 # from src.library.numpy.func_loader import gaussian_optimize
 # from src.library.numpy.func_loader import gaussian_normalize
@@ -68,7 +69,6 @@ class Fourier(object):
         return self._m
 
 
-
 def Correlation(k, s, amp, phase):
     x = np.linspace(-100, 100, 20001)
     # x = np.arange(-1, 1, 0.01)
@@ -83,14 +83,12 @@ def Correlation(k, s, amp, phase):
     return nita
 
 
-
 def Correlation_test3(k, s, amp, phase):
     x = np.linspace(-100, 100, 20001)
     # x = np.arange(-1, 1, 0.01)
     g = acc_clip(x, clip_max=1.0)
     f = Fourier(amp * x + phase, k, s)
     return np.dot(f, g) / np.linalg.norm(f) / np.linalg.norm(g)
-
 
 
 # def Correlation2(amp, phase):
@@ -159,20 +157,35 @@ if __name__ == "__main__":
         #     lst_01.append((seed, cor))
         # else:
         #     lst_00.append((seed, cor))
-        cor_lst001.append(cor_001)
+        # cor_lst001.append(cor_001)
         # cor_sl.append((seed,cor))
 
-    for i in range(0, 10000):
-        cor_0001 = Correlation(k, i, amp=0.001, phase=0)
-        cor_lst0001.append(cor_0001)
+        if cor_001 >= 0.5:
+            lst_05.append((seed, cor_001))
+        elif cor_001 >= 0.4:
+            lst_04.append((seed, cor_001))
+        elif cor_001 >= 0.3:
+            lst_03.append((seed, cor_001))
+        elif cor_001 >= 0.2:
+            lst_02.append((seed, cor_001))
+        elif cor_001 >= 0.1:
+            lst_01.append((seed, cor_001))
+        else:
+            lst_00.append((seed, cor_001))
+        cor_lst001.append(cor_001)
+        cor_sl.append((seed, cor_001))
 
-    for n in range(0, 10000):
-        cor_01 = Correlation(k, n, amp=0.1, phase=0)
-        cor_lst01.append(cor_01)
+    # for i in range(0, 10000):
+    #     cor_0001 = Correlation(k, i, amp=0.001, phase=0)
+    #     cor_lst0001.append(cor_0001)
 
-    for q in range(0, 10000):
-        cor_1 = Correlation(k, q, amp=1, phase=0)
-        cor_lst1.append(cor_1)
+    # for n in range(0, 10000):
+    #     cor_01 = Correlation(k, n, amp=0.1, phase=0)
+    #     cor_lst01.append(cor_01)
+
+    # for q in range(0, 10000):
+    #     cor_1 = Correlation(k, q, amp=1, phase=0)
+    #     cor_lst1.append(cor_1)
     # sorted_list = sorted(
     #     cor_sl,
     #     key=lambda t: t[1],
@@ -187,7 +200,7 @@ if __name__ == "__main__":
     # fig1.savefig('distribution_1.png', dpi=500)
     ## ax1.set_title('amp = 1')
     ## ax1.set_ylabel('Density')
-    
+
     # fig2 = plt.figure(1, figsize=(4, 3))
     # plt.hist(cor_lst01, bins=50, range=(-1,1), density=True, color='#ADD8E6')
     # plt.tick_params(labelsize=20)
@@ -195,32 +208,47 @@ if __name__ == "__main__":
     # fig2.savefig('distribution_01.png', dpi=500)
     # ax2.set_title('amp = 0.1')
 
-    # fig3 = plt.figure(1, figsize=(4, 3))
-    # plt.hist(cor_lst001, bins=50, range=(-1,1), density=True, color='#ADD8E6')
-    # plt.tick_params(labelsize=20)
-    # plt.xticks(tick)
-    # fig3.savefig('distribution_001.png', dpi=500)
+    fig3 = plt.figure(1, figsize=(4, 3))
+    plt.hist(cor_lst001, bins=50, range=(-1,1), density=True, color='#ADD8E6')
+    plt.tick_params(labelsize=20)
+    plt.xticks(tick)
+    fig3.savefig('distribution_001.png', dpi=500)
     # ax3.set_title('amp = 0.01')
     # ax3.set_xlabel('Correlation Coefficient')
     # ax3.set_ylabel('Density')
 
-    fig4 = plt.figure(1, figsize=(4, 3))
-    plt.hist(cor_lst0001, bins=50, range=(-1, 1), density=True, color="#ADD8E6")
-    plt.tick_params(labelsize=20)
-    plt.xticks(tick)
-    fig4.savefig("distribution_0001.png", dpi=500)
+    # fig4 = plt.figure(1, figsize=(4, 3))
+    # plt.hist(cor_lst0001, bins=50, range=(-1, 1), density=True, color="#ADD8E6")
+    # plt.tick_params(labelsize=20)
+    # plt.xticks(tick)
+    # fig4.savefig("distribution_0001.png", dpi=500)
     # ax4.set_title('amp = 0.001')
     # ax4.set_xlabel('Correlation Coefficient')
 
     # fig.suptitle('Distribution of Correlation Coefficient', fontsize=18)
 
     plt.show()
-    # print(lst_05)
-    # print(lst_04)
-    # print(lst_03)
-    # print(lst_02)
-    # print(lst_01)
-    # print(lst_00)
+    lst_05 = random.sample(lst_05, 10)
+    lst_04 = random.sample(lst_04, 10)
+    lst_03 = random.sample(lst_03, 10)
+    lst_02 = random.sample(lst_02, 10)
+    lst_01 = random.sample(lst_01, 10)
+    lst_00 = random.sample(lst_00, 10)
+    
+    with open("good_seed_output.txt", "w") as f:
+        f.write(f"lst_05: {lst_05}\n")
+        f.write(f"lst_04: {lst_04}\n")
+        f.write(f"lst_03: {lst_03}\n")
+        f.write(f"lst_02: {lst_02}\n")
+        f.write(f"lst_01: {lst_01}\n")
+        f.write(f"lst_00: {lst_00}\n")
+
+    print(lst_05)
+    print(lst_04)
+    print(lst_03)
+    print(lst_02)
+    print(lst_01)
+    print(lst_00)
 
     #
     # # opto_lst =[]
@@ -303,3 +331,20 @@ if __name__ == "__main__":
     # plt.grid(linestyle='--')
     # plt.savefig('opto_cor.png', dpi=500)
     # plt.show()
+
+    # good_seeds = []  # 存储“好种子” (seed, nita)
+    # threshold = 0.5  # 设定 nita 的筛选阈值
+
+    # for seed in range(0, 10000):
+    #     cor_001 = Correlation(k, seed, amp=0.01, phase=0)
+    #     # 如果 nita 符合条件，就保存种子和 nita
+    #     if cor_001 >= threshold:
+    #         good_seeds.append((seed, cor_001))
+
+    # # 打印所有符合条件的种子和 nita
+    # print("符合条件的种子及其 nita 值：")
+    # for seed, nita in good_seeds:
+    #     print(f"Seed: {seed}, Nita: {nita}")
+
+    # # 统计找到的好种子数量
+    # print(f"总共找到 {len(good_seeds)} 个符合条件的种子。")
