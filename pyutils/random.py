@@ -3,18 +3,21 @@
 
 __all__ = ["roulette_choice", "shuffle", "markov_chain"]
 
-import numpy as np
+# import numpy as np
+import torch
 import numpy.random as rnd
 import bisect
 import random
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def roulette_choice(w):
     '''
     Choosing index with probability array
     Generating accumulate weight with numpy.cumsum()
     '''
-    tot = np.cumsum(w)
+    # tot = np.cumsum(w)
+    tot = torch.cumsum(w, dim=0)  # Perform cumulative sum along the first dimension
+
     return bisect.bisect_left(tot, random.random() * tot[-1])
 
 
@@ -43,7 +46,11 @@ def markov_chain(prob, N, init_state=None):
         list: N-step array
     '''
     series = []
-    prob = np.array(prob)
+    # prob = np.array(prob)
+    prob = torch.tensor(
+        prob, device=device
+    )  # Convert the array to a tensor on the specified device
+
     state = rnd.randint(prob.shape[0]) if init_state is None else init_state
     series.append(state)
     for _ in range(N - 1):

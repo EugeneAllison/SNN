@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
+# subset_indices = np.arange(int(subset_size)) # 20250110 用torch替代line 107 108
 
 import torch
 import torch.nn as nn
@@ -104,7 +104,8 @@ def get_data_loader(task_type, batch_size_train, batch_size_eval, subset_size=No
         sampler = None
     else:
         shuffle = False
-        subset_indices = np.arange(int(subset_size))
+        # subset_indices = np.arange(int(subset_size)) # 20250110 用torch替代
+        subset_indices = torch.arange(int(subset_size))
         sampler = torch.utils.data.sampler.SubsetRandomSampler(subset_indices)
     loader_train = torch.utils.data.DataLoader(
         data_train, batch_size=batch_size_train, shuffle=shuffle, sampler=sampler)

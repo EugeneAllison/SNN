@@ -5,7 +5,7 @@ __all__ = ["Figure"]
 
 import os
 import warnings
-import numpy as np
+import torch
 import pandas as pd
 from threading import Thread
 
@@ -30,6 +30,8 @@ from matplotlib.ticker import LogFormatterMathtext
 from matplotlib.backends.backend_pdf import PdfPages
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 全部改正方法见TranThanhMan -- 一月 -- Figure 代码修改
 # warnings.filterwarnings("ignore", category=cbook.mplDeprecation)
@@ -116,9 +118,9 @@ def plot_matrix(self, mat, x=None, y=None, aspect=None, zscale=None,
                 extent=None, formatter=None,
                 **kwargs):
     if x is None:
-        x = np.arange(mat.shape[1])
+        x = torch.arange(mat.shape[1], device=device)
     if y is None:
-        y = np.arange(mat.shape[0])
+        y = torch.arange(mat.shape[0], device=device)
     x_size, y_size = len(x), len(y)
     if extent is None:
         extent = [0, x_size, 0, y_size]
@@ -139,8 +141,16 @@ def plot_matrix(self, mat, x=None, y=None, aspect=None, zscale=None,
         im = self.contour(x, y, mat, norm=norm, extent=extent,
                           vmin=vmin, vmax=vmax, **kwargs)
     else:
-        im = self.imshow(mat[::-1], norm=norm, extent=extent, aspect=aspect,
-                         vmin=vmin, vmax=vmax, **kwargs)
+        # im = self.imshow(mat[::-1], norm=norm, extent=extent, aspect=aspect,
+        #  vmin=vmin, vmax=vmax, **kwargs)
+        # 修复后：
+        im = self.imshow(
+            torch.flip(mat, dims=[0]).cpu().numpy(),
+            norm=norm,
+            extent=extent,
+            aspect=aspect,
+        )
+
     if flip_axis:
         self.invert_yaxis()
     if colorbar:
@@ -150,13 +160,17 @@ def plot_matrix(self, mat, x=None, y=None, aspect=None, zscale=None,
         cb = self.figure.colorbar(im, cax=cax, format=formatter)
     if num_label_x is not None:
         x_skip = int(x_size / num_label_x)
-        self.set_xticks(np.arange(x_size)[::x_skip])
+        # self.set_xticks(np.arange(x_size)[::x_skip])
+        self.set_xticks(torch.arange(x_size, device=device).cpu().numpy()[::x_skip])
+
         xlabels = [ticks_fmt.format(_l) if ticks_cond(_i) else "" for _i, _l in enumerate(x)]
         self.set_xticklabels(xlabels[::x_skip])
 
     if num_label_y is not None:
         y_skip = int(y_size / num_label_y)
-        self.set_yticks(np.arange(y_size)[::y_skip])
+        # self.set_yticks(np.arange(y_size)[::y_skip])
+        self.set_yticks(torch.arange(y_size, device=device).cpu().numpy()[::y_skip])
+
         ylabels = [ticks_fmt.format(_l) if ticks_cond(_i) else "" for _i, _l in enumerate(y)]
         self.set_yticklabels(ylabels[::y_skip])
     if colorbar:
@@ -253,12 +267,24 @@ def set_log_grid(self, axis="y"):
     self.grid(True)
     if "y" in axis or axis == "both":
         self.set_yscale("log")
-        locmin = mticker.LogLocator(base=10, subs=np.arange(0.1, 1, 0.1), numticks=10)
+        # locmin = mticker.LogLocator(base=10, subs=np.arange(0.1, 1, 0.1), numticks=10)
+        locmin = mticker.LogLocator(
+            base=10,
+            subs=torch.arange(0.1, 1, 0.1, device=device).cpu().numpy(),
+            numticks=10,
+        )
+
         self.yaxis.set_minor_locator(locmin)
         self.yaxis.set_minor_formatter(mticker.NullFormatter())
     if "x" in axis or axis == "both":
         self.set_xscale("log")
-        locmin = mticker.LogLocator(base=10, subs=np.arange(0.1, 1, 0.1), numticks=10)
+        # locmin = mticker.LogLocator(base=10, subs=np.arange(0.1, 1, 0.1), numticks=10)
+        locmin = mticker.LogLocator(
+            base=10,
+            subs=torch.arange(0.1, 1, 0.1, device=device).cpu().numpy(),
+            numticks=10,
+        )
+
         self.xaxis.set_minor_locator(locmin)
         self.xaxis.set_minor_formatter(mticker.NullFormatter())
 
